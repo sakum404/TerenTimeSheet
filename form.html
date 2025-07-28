@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Заполнить таймшит</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      padding: 20px;
+      color: #333;
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: 600;
+    }
+
+    select, input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: border 0.2s ease;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      background: linear-gradient(to right, #4CAF50, #43A047);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #43A047, #388E3C);
+    }
+  </style>
+</head>
+<body>
+  <h3>TerenTimeSheet</h3>
+
+  <label for="projects">Проект</label>
+  <select id="projects"></select>
+
+  <label for="period">Период</label>
+  <select id="period"></select>
+
+  <label for="executor">Исполнитель</label>
+  <select id="executor" onchange="fillPosition()"></select>
+
+  <label for="position">Позиция</label>
+  <input type="text" id="position" readonly />
+
+  <label for="task">Задача</label>
+  <select id="task"></select>
+
+  <label for="time_frame">Временные рамки</label>
+  <select id="time_frame"></select>
+
+  <label for="difficulty_level">Уровень сложности</label>
+  <select id="difficulty_level"></select>
+
+  <label for="time">Затраченное время</label>
+  <input type="number" id="time" />
+
+
+  <label for="overtime">Есть ли переработки?</label>
+  <select id="overtime">
+    <option value="Нет">Нет</option>
+    <option value="Да">Да</option>
+  </select>
+
+  <label for="comment">Комментарий</label>
+  <textarea id="comment" rows="3" placeholder="Дополнительная информация..."></textarea>
+
+  <button onclick="submitForm()">Отправить</button>
+
+  <script>
+    async function loadFields() {
+      const res = await fetch('/form-data');
+      const data = await res.json();
+
+      window.positionMap = data.position_map;
+
+      fillSelect("projects", data.projects);
+      fillSelect("period", data.period);
+      fillSelect("executor", data.executor);
+      fillSelect("task", data.task);
+      fillSelect("time_frame", data.time_frame);
+      fillSelect("difficulty_level", data.difficulty_level);
+      fillTimeOptions();
+    }
+
+    function fillSelect(id, values) {
+      const select = document.getElementById(id);
+      values.forEach(value => {
+        const opt = document.createElement("option");
+        opt.value = opt.textContent = value;
+        select.appendChild(opt);
+      });
+    }
+
+    function fillTimeOptions() {
+      const select = document.getElementById("time");
+      for (let i = 0.5; i <= 12; i += 0.5) {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `${i} ч`;
+        select.appendChild(opt);
+      }
+    }
+
+    function fillPosition() {
+      const executor = document.getElementById("executor").value;
+      document.getElementById("position").value = window.positionMap[executor] || "";
+    }
+
+    function submitForm() {
+      const data = {
+        projects: document.getElementById("projects").value,
+        period: document.getElementById("period").value,
+        executor: document.getElementById("executor").value,
+        position: document.getElementById("position").value,
+        task: document.getElementById("task").value,
+        time_frame: document.getElementById("time_frame").value,
+        difficulty_level: document.getElementById("difficulty_level").value,
+        time: document.getElementById("time").value,
+        overtime: document.getElementById("overtime").value,
+        comment: document.getElementById("comment").value
+      };
+
+      Telegram.WebApp.sendData(JSON.stringify(data));
+      Telegram.WebApp.close();
+    }
+
+    window.onload = loadFields;
+  </script>
+</body>
+</html>
