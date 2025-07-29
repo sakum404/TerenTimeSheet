@@ -13,6 +13,7 @@ from telegram.ext import (
 from threading import Thread
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
+from collections import OrderedDict
 
 # --- Настройки из переменных окружения ---
 try:
@@ -76,7 +77,7 @@ async def serve_form_data():
 
     fields_data = {
         "projects": sorted(set(row["projects"] for row in data if row.get("projects"))),
-        "period": sorted(set(row["period"] for row in data if row.get("period"))),
+        "period": list(OrderedDict.fromkeys(row["period"] for row in data if row.get("period"))),
         "executor": sorted(set(row["executor"] for row in data if row.get("executor"))),
         "task": sorted(set(row["task"] for row in data if row.get("task"))),
         "time_frame": sorted(set(row["time_frame"] for row in data if row.get("time_frame"))),
