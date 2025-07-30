@@ -13,7 +13,7 @@ from telegram.ext import (
 
 # === Конфигурация ===
 TELEGRAM_TOKEN = "7523210458:AAFsp53vLRkriA3rjYewxcrKD27wjQ_ahnw"
-ALLOWED_PASSWORD = "Teren2025"
+ALLOWED_PASSWORD = "Teren2024"
 FORM_URL = "https://terentimesheet.utc-service.kz/form.html"  # Укажи HTTPS ссылку
 
 SCOPE = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
